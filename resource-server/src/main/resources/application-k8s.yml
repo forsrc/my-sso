@@ -1,0 +1,7 @@
+server:
+  port: 8080
+
+my:
+  client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
+  oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:8080}
+  resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8080}

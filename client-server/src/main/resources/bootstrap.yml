@@ -1,0 +1,51 @@
+
+my:
+  client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
+  oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:8080}
+  resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8080}
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          oauth2-client-oidc:
+            provider: spring
+            client-id: oauth2-client
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: ${my.client-server}/login/oauth2/code/{registrationId}
+            scope: openid
+            client-name: oauth2-client-oidc
+          oauth2-client-authorization-code:
+            provider: spring
+            client-id: oauth2-client
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: ${my.client-server}/authorized
+            scope: api
+            client-name: oauth2-client-authorization-code
+        provider:
+          spring:
+            issuer-uri: ${my.oauth2-server}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+      probes:
+        enabled: true
