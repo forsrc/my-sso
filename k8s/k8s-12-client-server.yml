@@ -30,7 +30,7 @@ spec:
         resources: {}
         env:
         - name: MY_PROFILE
-        - vaule: k8s
+          value: k8s
         - name: MY_EUREKA_SERVER
           value: http://forsrc:forsrc@eureka-server:8080/eureka
         livenessProbe:
