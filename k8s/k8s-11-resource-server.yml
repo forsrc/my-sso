@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: resource-server
+  name: resource-server
+  namespace: my-sso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: resource-server
+      # annotations:
+      #   co.elastic.logs/enabled: "true"
+      #   co.elastic.logs.json-logging/json.keys_under_root: "true"
+      #   co.elastic.logs.json-logging/json.add_error_key: "true"
+      #   co.elastic.logs.json-logging/json.message_key: "message"
+    spec:
+      containers:
+      - image: forsrc/my-sso:resource-server
+        name: resource-server
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: IfNotPresent #Always
+        resources: {}
+        env:
+        - name: MY_PROFILE
+        - vaule: k8s
+        - name: MY_EUREKA_SERVER
+          value: http://forsrc:forsrc@eureka-server:8080/eureka
+        livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+      initContainers:
+      - name: init-waiting
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z oauth2-server 8080; do echo waiting for oauth2-server 8080; sleep 2; done;']
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: resource-server
+  namespace: my-sso
+spec:
+  selector:
+    app: resource-server
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: resource-server
+  type: ClusterIP
