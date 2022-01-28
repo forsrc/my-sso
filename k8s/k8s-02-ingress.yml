@@ -11,14 +11,14 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
     nginx.ingress.kubernetes.io/session-cookie-path: /
     nginx.ingress.kubernetes.io/rewrite-target: /
-    #nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
-#  tls:
-#  - hosts:
-#    - oauth2-server
-#    - resource-server
-#    - client-server
-#    secretName: my-sso.forsrc.com
+  tls:
+  - hosts:
+    - oauth2-server
+    - resource-server
+    - client-server
+    secretName: my-sso.forsrc.com
   rules:
   - host: oauth2-server
     http:
@@ -29,7 +29,7 @@ spec:
           service:
             name: oauth2-server
             port:
-              number: 8080
+              number: 80
   - host: resource-server
     http:
       paths:
@@ -39,7 +39,7 @@ spec:
           service:
             name: resource-server
             port:
-              number: 8080
+              number: 80
   - host: client-server
     http:
       paths:
@@ -49,4 +49,4 @@ spec:
           service:
             name: client-server
             port:
-              number: 8080
+              number: 80
