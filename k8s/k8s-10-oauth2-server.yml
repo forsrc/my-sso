@@ -31,6 +31,12 @@ spec:
         env:
         - name: MY_PROFILE
           value: k8s
+        - name: MY_OAUTH2_SERVER
+          value: http://oauth2-server
+        - name: MY_RESOURCE_SERVER
+          value: http//resource-server
+        - name: MY_CLIENT_SERVER
+          value: http://client-server
         - name: MY_EUREKA_SERVER
           value: http://forsrc:forsrc@eureka-server:8080/eureka
         livenessProbe:
@@ -63,7 +69,7 @@ spec:
   selector:
     app: oauth2-server
   ports:
-  - port: 8080
+  - port: 80
     targetPort: 8080
     name: oauth2-server
   type: ClusterIP

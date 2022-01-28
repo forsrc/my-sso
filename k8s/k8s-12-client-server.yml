@@ -31,6 +31,12 @@ spec:
         env:
         - name: MY_PROFILE
           value: k8s
+        - name: MY_OAUTH2_SERVER
+          value: http://oauth2-server
+        - name: MY_RESOURCE_SERVER
+          value: http://resource-server
+        - name: MY_CLIENT_SERVER
+          value: http://client-server
         - name: MY_EUREKA_SERVER
           value: http://forsrc:forsrc@eureka-server:8080/eureka
         livenessProbe:
@@ -50,7 +56,7 @@ spec:
       initContainers:
       - name: init-waiting
         image: busybox:1.28
-        command: ['sh', '-c', 'until nc -z oauth2-server 8080; do echo waiting for oauth2-server 8080; sleep 2; done;']
+        command: ['sh', '-c', 'until nc -z oauth2-server 80; do echo waiting for oauth2-server 80; sleep 2; done;']
 
 ---
 
@@ -63,7 +69,7 @@ spec:
   selector:
     app: client-server
   ports:
-  - port: 8080
+  - port: 80
     targetPort: 8080
     name: client-server
   type: ClusterIP

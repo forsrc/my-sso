@@ -18,7 +18,7 @@ public class SecurityConfig {
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
 		    .authorizeRequests(a -> a
-      		  .antMatchers("/actuator/**").permitAll()
+      		  .antMatchers("/actuator/**", "/.well-known/openid-configuration").permitAll()
       		  )
 		    .authorizeRequests(
 		    		authorizeRequests -> authorizeRequests.anyRequest().authenticated()
