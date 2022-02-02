@@ -15,6 +15,7 @@ logging:
     org.springframework.security.oauth2: INFO
 
 spring:
+  application:    name: client-server
   security:
     oauth2:
       client:

@@ -36,7 +36,7 @@ spec:
         - name: MY_RESOURCE_SERVER
           value: http//resource-server
         - name: MY_CLIENT_SERVER
-          value: http://client-server
+          value: https://client-server
         - name: MY_EUREKA_SERVER
           value: http://forsrc:forsrc@eureka-server:8080/eureka
         livenessProbe:
