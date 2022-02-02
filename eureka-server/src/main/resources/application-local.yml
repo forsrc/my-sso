@@ -1,0 +1,8 @@
+my:
+  hostname: ${MY_HOST_NAME:eureka-server}
+  port: ${MY_PORT:9999}
+  application-name: ${MY_APPLICATION_NAME:eureka-server}
+  username: ${MY_USERNAME:forsrc}
+  password: ${MY_PASSWORD:forsrc}
+  eureka-server: ${MY_EUREKA_SERVER:http://forsrc:forsrc@eureka-server:9999/eureka}
+  admin-server: ${MY_ADMIN_SERVER:http://admin-server:9090}
