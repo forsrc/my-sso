@@ -1,0 +1,16 @@
+my:
+  hostname: ${MY_HOST_NAME:gateway-server}
+  port: ${MY_PORT:80}
+  application-name: ${MY_APPLICATION_NAME:gateway-server}
+  username: ${MY_USERNAME:forsrc}
+  password: ${MY_PASSWORD:forsrc}
+  eureka-server: ${MY_EUREKA_SERVER:http://forsrc:forsrc@eureka-server:8080/eureka}
+  admin-server: ${MY_ADMIN_SERVER:http://admin-server:8080}
+  
+  gateway-base-url: ${MY_GATEWAY:http://gateway-server}
+  gateway-oauth2-server: ${my.gateway-base-url}/oauth2-server/
+  gateway-resource_server: ${my.gateway-base-url}/resource-server/
+  gateway-client-server: ${my.gateway-base-url}/client-server/
+  gateway-eureka-server: ${my.gateway-base-url}/eureka-server/
+  gateway-admin-server: ${my.gateway-base-url}/admin-server/
+  

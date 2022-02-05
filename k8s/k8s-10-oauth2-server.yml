@@ -34,11 +34,15 @@ spec:
         - name: MY_OAUTH2_SERVER
           value: http://oauth2-server
         - name: MY_RESOURCE_SERVER
-          value: http//resource-server
+          value: http://:resource-server
         - name: MY_CLIENT_SERVER
-          value: https://client-server
+          value: https://client-server      ############### https
+        - name: MY_GATEWAY
+          value: https://gateway-server     ############### https
         - name: MY_EUREKA_SERVER
           value: http://forsrc:forsrc@eureka-server:8080/eureka
+        - name: MY_ADMIN_SERVER
+          value: http://admin-server:8080
         livenessProbe:
             httpGet:
               path: /actuator/health/liveness

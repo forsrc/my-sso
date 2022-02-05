@@ -1,8 +1,12 @@
-server:
-  port: 8090
-  
 
 my:
+  application-name: ${MY_APPLICATION_NAME:resource-server}
+  hostname: ${MY_HOST_NAME:resource-server}
+  port: ${MY_PORT:8090}
   client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
-  oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:8080}
-  resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8080}
+  oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:9000}
+  resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8090}
+  username: ${MY_USERNAME:forsrc}
+  password: ${MY_PASSWORD:forsrc}
+  eureka-server: ${MY_EUREKA_SERVER:http://forsrc:forsrc@eureka-server:9999/eureka}
+  admin-server: ${MY_ADMIN_SERVER:http://admin-server:9900}

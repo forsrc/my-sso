@@ -20,6 +20,26 @@ spec:
     - client-server
     secretName: my-sso.forsrc.com
   rules:
+  - host: eureka-server
+    http:
+      paths:
+      - path: /
+        pathType: Prefix #"Exact", "Prefix", or "ImplementationSpecific"
+        backend:
+          service:
+            name: eureka-server
+            port:
+              number: 80
+  - host: gateway-server
+    http:
+      paths:
+      - path: /
+        pathType: Prefix #"Exact", "Prefix", or "ImplementationSpecific"
+        backend:
+          service:
+            name: gateway-server
+            port:
+              number: 80
   - host: oauth2-server
     http:
       paths:

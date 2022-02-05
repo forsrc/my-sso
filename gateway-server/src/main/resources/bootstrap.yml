@@ -1,0 +1,228 @@
+my:
+  hostname: ${MY_HOST_NAME:gateway-server}
+  port: ${MY_PORT:80}
+  application-name: ${MY_APPLICATION_NAME:gateway-server}
+  username: ${MY_USERNAME:forsrc}
+  password: ${MY_PASSWORD:forsrc}
+  eureka-server: ${MY_EUREKA_SERVER:http://forsrc:forsrc@eureka-server:8080/eureka}
+  admin-server: ${MY_ADMIN_SERVER:http://admin-server:8080}
+  
+  
+  gateway-base-url: ${MY_GATEWAY:http://gateway-server}
+  gateway-oauth2-server: ${my.gateway-base-url}/oauth2-server/
+  gateway-resource_server: ${my.gateway-base-url}/resource-server/
+  gateway-client-server: ${my.gateway-base-url}/client-server/
+  gateway-eureka-server: ${my.gateway-base-url}/eureka-server/
+  gateway-admin-server: ${my.gateway-base-url}/admin-server/
+
+
+server:
+  port: ${my.port}
+
+  forward-headers-strategy: framework
+  tomcat:
+    remoteip:
+      remote-ip-header: x-forwarded-for
+      protocol-header: x-forwarded-proto
+
+
+
+spring:
+  application:
+    name: ${my.application-name}
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+  boot:
+    admin:
+      client:
+        url: ${my.admin-server}
+        username: ${my.username}
+        password: ${my.password}
+        instance:
+          service-base-url: http://${my.hostname}:${my.port}
+          management-base-url: http://${my.hostname}:${my.port}
+
+  datasource:
+    url: ${MY_DB_URL:jdbc:h2:~/tmp/db/h2/gateway-server.h2;AUTO_SERVER=TRUE;MODE=MYSQL;}
+    username: ${MY_DB_USERNAME:sa}
+    password: ${MY_DB_PASSWORD:sa}
+    driver-class-name: ${MY_DB_DRIVER:org.h2.Driver}
+  #    data:
+  #      - classpath:schema.sql
+  #      - classpath:data.sql
+  jpa:
+    database-platform: ${MY_DB_DIALECT:org.hibernate.dialect.H2Dialect}
+    show-sql: true
+    properties:
+      hibernate.enable_lazy_load_no_trans: true
+      hibernate.show-sql: true
+      hibernate.hbm2ddl.auto: update
+    open-in-view: true
+
+  cloud:
+    gateway:
+#      httpclient:
+#        ssl:
+#          useInsecureTrustManager: true
+      discovery:
+        locator:
+          enabled: true
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedHeaders: "*"
+            allowedOrigins: "*"
+            allowedMethods: GET,POST,DELETE,PUT,OPTION
+      forwarded:
+        enabled: true
+      x-forwarded:
+        enabled: true
+        prefix-enabled: true
+        for-enabled: true
+        proto-enabled: true
+        host-enabled: true
+        host-append: false
+        for-append: false
+        proto-append: false
+        prefix-append: false
+        port-append: false
+      default-filters:      - name: CircuitBreaker
+        args:
+          name: gateway
+          fallbackUri: forward:/fallback
+      routes:
+        - id: oauth2-server
+          uri: lb://oauth2-server
+          predicates:
+            - Path=/oauth2-server/**
+          filters:
+            - CachingRequestBodyFilter
+            - AddRequestHeader=gateway_enable, true
+            - AddRequestHeader=gateway_oauth2_server, ${my.gateway-oauth2-server}
+            - RewritePath=/oauth2-server/(?<segment>/?.*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: oauth2-server
+                fallbackUri: forward:/fallback
+        - id: resource-server
+          uri: lb://resource-server
+          predicates:
+            - Path=/resource-server/**
+          filters:
+            - CachingRequestBodyFilter
+            - AddRequestHeader=gateway_enable, true
+            - AddRequestHeader=gateway_oauth2_server, ${my.gateway-server}
+            - RewritePath=/resource-server/(?<segment>/?.*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: resource-server
+                fallbackUri: forward:/fallback
+        - id: client-server
+          uri: lb://client-server
+          predicates:
+            - Path=/client-server/**
+          filters:
+            - CachingRequestBodyFilter
+            - AddRequestHeader=gateway_enable, true
+            - AddRequestHeader=gateway_oauth2_server, ${my.gateway-oauth2-server}
+            - AddRequestHeader=gateway_client-server, ${my.gateway-client-server}
+            - RewritePath=/client-server/(?<segment>/?.*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: client-server
+                fallbackUri: forward:/fallback
+        - id: eureka-server
+          uri: lb://eureka-server
+          predicates:
+            - Path=/eureka-server/**
+          filters:
+            - CachingRequestBodyFilter
+            - AddRequestHeader=gateway_enable, true
+            - AddRequestHeader=gateway_oauth2_server, ${my.gateway-oauth2-server}
+            - AddRequestHeader=gateway_oauth2_eureka_server, ${my.gateway-eureka-server}
+            - RewritePath=/eureka-server/(?<segment>/?.*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: eureka-server
+                fallbackUri: forward:/fallback
+        - id: admin-server
+          uri: lb://admin-server
+          predicates:
+            - Path=/admin-server/**
+          filters:
+            - CachingRequestBodyFilter
+            - AddRequestHeader=gateway_enable, true
+            - AddRequestHeader=gateway_oauth2_server, ${my.gateway-oauth2-server}
+            - AddRequestHeader=gateway_oauth2_eureka_server, ${my.gateway-eureka-server}
+            - RewritePath=/admin-server/(?<segment>/?.*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: admin-server
+                fallbackUri: forward:/fallback
+
+
+eureka:
+  instance:
+    non-secure-port-enabled: true
+    secure-port-enabled: true
+    #prefer-ip-address:              true
+    hostname: ${my.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+    appname: ${spring.application.name}
+    leaseRenewalIntervalInSeconds: 5
+#    home-page-url: http://${eureka.instance.hostname}:${server.port}
+#    health-check-url: ${eureka.instance.home-page-url}/actuator/health
+#    status-page-url: ${eureka.instance.home-page-url}/actuator/info
+#    metadata-map:
+#      user.name: ${my.username}
+#      user.password: ${my.password}
+  client:
+    service-url: 
+      # defaultZone: http://forsrc:forsrc@${my.eureka-server}/eureka
+      defaultZone: ${my.eureka-server}
+      
+
+management:
+  health:    circuitbreakers:      enabled: true
+    
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    jmx:
+      exposure:
+        include: "*"
+  endpoint:
+    hystrix:
+      stream:
+        enabled: true
+    health:
+      show-details: ALWAYS
+      probes:
+        enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+
+
+hystrix:
+  metrics:    enabled: true 
+  dashboard:
+    proxy-stream-allow-list: "*"
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds:  120000
+          semaphore:
+            maxConcurrentRequests: 1000
+      circuitBreaker:
+        sleepWindowInMilliseconds:  5000

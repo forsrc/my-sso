@@ -1,5 +1,7 @@
 package com.forsrc.sso.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -9,8 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @EnableWebSecurity
 public class SecurityConfig {
 
@@ -18,12 +18,15 @@ public class SecurityConfig {
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
 		    .authorizeRequests(a -> a
-      		  .antMatchers("/actuator/**", "/.well-known/openid-configuration").permitAll()
-      		  )
-		    .authorizeRequests(
-		    		authorizeRequests -> authorizeRequests.anyRequest().authenticated()
-		    )
-			.formLogin(withDefaults());
+				.antMatchers("/actuator/**", "/.well-known/openid-configuration").permitAll()
+			)
+			.authorizeRequests(
+					authorizeRequests -> authorizeRequests.anyRequest().authenticated()
+			)
+		    .formLogin(withDefaults())
+		    .formLogin()
+			.failureUrl("/login?error")
+			;
 		return http.build();
 	}
 

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: eureka-server
+  name: eureka-server
+  namespace: my-sso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+      # annotations:
+      #   co.elastic.logs/enabled: "true"
+      #   co.elastic.logs.json-logging/json.keys_under_root: "true"
+      #   co.elastic.logs.json-logging/json.add_error_key: "true"
+      #   co.elastic.logs.json-logging/json.message_key: "message"
+    spec:
+      containers:
+      - image: forsrc/my-sso:eureka-server
+        name: eureka-server
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: IfNotPresent #Always
+        resources: {}
+        env:
+        - name: MY_PROFILE
+          value: k8s
+        - name: MY_OAUTH2_SERVER
+          value: http://oauth2-server
+        - name: MY_RESOURCE_SERVER
+          value: http://:resource-server
+        - name: MY_CLIENT_SERVER
+          value: http://client-server     
+        - name: MY_GATEWAY
+          value: http://gateway-server     
+        - name: MY_EUREKA_SERVER
+          value: http://forsrc:forsrc@eureka-server:8080/eureka
+        - name: MY_ADMIN_SERVER
+          value: http://admin-server
+        livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+      # initContainers:
+      # - name: init-waiting
+      #   image: busybox:1.28
+      #   command: ['sh', '-c', 'until nc -z eureka-server 8080; do echo waiting for eureka-server 8080; sleep 2; done;']
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-server
+  namespace: my-sso
+spec:
+  selector:
+    app: eureka-server
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: eureka-server
+  type: ClusterIP
+

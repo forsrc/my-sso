@@ -1,9 +1,10 @@
 package com.forsrc.sso.config;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,17 +23,19 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.UUID;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
 	
 	@Value("${my.client-server}")
 	private String clientServer;
+
+	@Value("${my.gateway-client-server}")
+	private String gatewayClientServer;
 	
 	@Value("${my.oauth2-server}")
 	private String oauth2Server;
@@ -46,7 +49,7 @@ public class AuthorizationServerConfig {
 
 	@Bean
 	public RegisteredClientRepository registeredClientRepository() {
-		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+		RegisteredClient registeredClient = RegisteredClient.withId("client-server")
 				.clientId("oauth2-client")
 				.clientSecret("{noop}secret")
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
@@ -54,11 +57,26 @@ public class AuthorizationServerConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.redirectUri(clientServer + "/login/oauth2/code/oauth2-client-oidc")
 				.redirectUri(clientServer + "/authorized")
+				.redirectUri(gatewayClientServer + "/login/oauth2/code/oauth2-client-gateway-oidc")
+				.redirectUri(gatewayClientServer + "/authorized")
+				.scope(OidcScopes.OPENID)
+				.scope("api")
+				.build();
+		RegisteredClient registeredGatwayClient = RegisteredClient.withId("gateway-client-server")
+				.clientId("oauth2-client-gateway")
+				.clientSecret("{noop}secret-gateway")
+				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+				.redirectUri(gatewayClientServer + "/login/oauth2/code/oauth2-client-gateway-oidc")
+				.redirectUri(gatewayClientServer + "/authorized")
 				.scope(OidcScopes.OPENID)
 				.scope("api")
 				.build();
 
-		return new InMemoryRegisteredClientRepository(registeredClient);
+		InMemoryRegisteredClientRepository repository = new InMemoryRegisteredClientRepository(registeredClient, registeredGatwayClient);
+				
+		return repository;
 	}
 
 	@Bean

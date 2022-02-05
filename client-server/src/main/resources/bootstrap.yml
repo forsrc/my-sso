@@ -1,21 +1,31 @@
 
 my:
+  application-name: ${MY_APPLICATION_NAME:client-server}
+  hostname: ${MY_HOST_NAME:client-server}
+  port: ${MY_PORT:8080}
   client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
   oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:8080}
   resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8080}
+  username: ${MY_USERNAME:forsrc}
+  password: ${MY_PASSWORD:forsrc}
+  eureka-server: ${MY_EUREKA_SERVER:http://forsrc:forsrc@eureka-server:8080/eureka}
+  admin-server: ${MY_ADMIN_SERVER:http://admin-server:8080}
+  gateway-base-url: ${MY_GATEWAY:http://gateway-server:8080}
+  gateway-client-server: ${my.gateway-base-url}/client-server
+  gateway-oauth2-server: ${my.gateway-base-url}/oauth2-server
 
 server:
-  port: 8080
+  port: ${my.port}
 
 logging:
   level:
     root: INFO
     org.springframework.web: INFO
-    org.springframework.security: INFO
-    org.springframework.security.oauth2: INFO
+    org.springframework.security: debug
+    org.springframework.security.oauth2: debug
 
 spring:
-  application:    name: client-server
+  application:    name: ${my.application-name}
   security:
     oauth2:
       client:
@@ -36,10 +46,37 @@ spring:
             redirect-uri: ${my.client-server}/authorized
             scope: api
             client-name: oauth2-client-authorization-code
+          oauth2-client-gateway-oidc:
+            provider: spring
+            client-id: oauth2-client
+            client-secret: secret-gateway
+            authorization-grant-type: authorization_code
+            redirect-uri: ${my.gateway-client-server}/login/oauth2/code/{registrationId}
+            scope: openid
+            client-name: oauth2-client-gateway-oidc
+          oauth2-client-gateway-authorization-code:
+            provider: spring
+            client-id: oauth2-client
+            client-secret: secret-gateway
+            authorization-grant-type: authorization_code
+            redirect-uri: ${my.gateway-client-server}/authorized
+            scope: api
+            client-name: oauth2-client-gateway-authorization-code
         provider:
           spring:
             issuer-uri: ${my.oauth2-server}
 
+
+  boot:
+    admin:
+      client:
+        url: ${my.admin-server}
+        username: ${my.username}
+        password: ${my.password}
+        instance:
+          service-base-url: ${my.hostname}:${my.port}
+          management-base-url: ${my.hostname}:${my.port}
+          
 management:
   endpoints:
     web:
@@ -50,3 +87,23 @@ management:
       show-details: ALWAYS
       probes:
         enabled: true
+
+eureka:
+  instance:
+    non-secure-port-enabled: true
+    secure-port-enabled: false
+    #prefer-ip-address:              true
+    hostname: ${my.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+    appname: ${spring.application.name}
+    leaseRenewalIntervalInSeconds: 5
+#    home-page-url: http://${eureka.instance.hostname}:${server.port}
+#    health-check-url: ${eureka.instance.home-page-url}/actuator/health
+#    status-page-url: ${eureka.instance.home-page-url}/actuator/info
+#    metadata-map:
+#      user.name: ${my.username}
+#      user.password: ${my.password}
+  client:
+    service-url: 
+      # defaultZone: http://forsrc:forsrc@${my.eureka-server}/eureka
+      defaultZone: ${my.eureka-server}

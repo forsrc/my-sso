@@ -1,31 +1,52 @@
 
 my:
+  application-name: ${MY_APPLICATION_NAME:oauth2-server}
+  hostname: ${MY_HOST_NAME:oauth2-server}
+  port: ${MY_PORT:8080}
+  gateway-client-server: ${MY_GATEWAY_CLIENT_SERVER:http://gateway-server:8080/client-server}
   client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
   oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:8080}
   resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8080}
-
-
+  username: ${MY_USERNAME:forsrc}
+  password: ${MY_PASSWORD:forsrc}
+  eureka-server: ${MY_EUREKA_SERVER:http://forsrc:forsrc@eureka-server:8080/eureka}
+  admin-server: ${MY_ADMIN_SERVER:http://admin-server:8080}
 
 server:
-  port: 8080
+  port: ${my.port}
 
 
 logging:
   level:
     root: INFO
     org.springframework.web: INFO
-    org.springframework.security: INFO
-    org.springframework.security.oauth2: INFO
+    org.springframework.security: debug
+    org.springframework.security.oauth2: debug
     
     
 spring:
   application:
-    name: oauth2-server
+    name: ${my.application-name}
 
-    
+  boot:
+    admin:
+      client:
+        url: ${my.admin-server}
+        username: ${my.username}
+        password: ${my.password}
+        instance:
+          service-base-url: ${my.hostname}:${my.port}
+          management-base-url: ${my.hostname}:${my.port}
+          
 management:
+  health:
+    circuitbreakers:
+      enabled: true
   endpoints:
     web:
+      exposure:
+        include: "*"
+    jmx:
       exposure:
         include: "*"
   endpoint:
@@ -33,3 +54,23 @@ management:
       show-details: ALWAYS
       probes:
         enabled: true
+
+eureka:
+  instance:
+    non-secure-port-enabled: true
+    secure-port-enabled: false
+    #prefer-ip-address:              true
+    hostname: ${my.hostname}
+    instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+    appname: ${spring.application.name}
+    leaseRenewalIntervalInSeconds: 5
+#    home-page-url: http://${eureka.instance.hostname}:${server.port}
+#    health-check-url: ${eureka.instance.home-page-url}/actuator/health
+#    status-page-url: ${eureka.instance.home-page-url}/actuator/info
+#    metadata-map:
+#      user.name: ${my.username}
+#      user.password: ${my.password}
+  client:
+    service-url: 
+      # defaultZone: http://forsrc:forsrc@${my.eureka-server}/eureka
+      defaultZone: ${my.eureka-server}

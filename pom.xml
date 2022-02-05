@@ -31,6 +31,7 @@
 
 	<modules>
 		<module>eureka-server</module>
+		<module>gateway-server</module>
 		<module>oauth2-server</module>
 		<module>resource-server</module>
 		<module>client-server</module>

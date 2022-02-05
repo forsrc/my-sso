@@ -9,10 +9,6 @@ my:
 
 server:
   port: ${my.port}
-  servlet:
-    session:
-      cookie:
-        name: ${my.hostname}
   forward-headers-strategy: framework
 
 
@@ -44,9 +40,9 @@ eureka:
     hostname: ${my.hostname}
     instance-id: ${my.hostname}:${my.application-name}:${my.port}
     appname: ${spring.application.name}
-    health-check-url-path: /actuator/health
-    home-page-url: http://${eureka.instance.hostname}:${server.port}
-    status-page-url: ${eureka.instance.home-page-url}/actuator
+#    home-page-url: http://${eureka.instance.hostname}:${server.port}
+#    health-check-url: ${eureka.instance.home-page-url}/actuator/health
+#    status-page-url: ${eureka.instance.home-page-url}/actuator/info
     leaseRenewalIntervalInSeconds: 5
     metadata-map:
       management.context-path: /actuator
