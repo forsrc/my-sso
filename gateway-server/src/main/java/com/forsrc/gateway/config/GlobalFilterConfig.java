@@ -139,11 +139,14 @@ public class GlobalFilterConfig {
 		if (StringUtils.hasText(ip) && !"unknown".equalsIgnoreCase(ip)) {
 			ipInfo.append("X-Real-IP:").append(ip).append(";");
 		}
-
-		ip = request.getRemoteAddress().getAddress().getHostAddress();
-		if (StringUtils.hasText(ip) && !"unknown".equalsIgnoreCase(ip)) {
-			ipInfo.append("getRemoteAddr=").append(ip).append(";");
+		
+		if (request.getRemoteAddress().getAddress() != null) {
+			ip = request.getRemoteAddress().getAddress().getHostAddress();
+			if (StringUtils.hasText(ip) && !"unknown".equalsIgnoreCase(ip)) {
+				ipInfo.append("getRemoteAddr=").append(ip).append(";");
+			}
 		}
+
 		return ipInfo.toString();
 	}
 }

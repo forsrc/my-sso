@@ -25,35 +25,37 @@ spec:
       - image: forsrc/my-sso:client-server
         name: client-server
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         imagePullPolicy: IfNotPresent #Always
         resources: {}
         env:
         - name: MY_PROFILE
           value: k8s
+        - name: MY_PORT
+          value: '80'
+        - name: MY_GATEWAY
+          value: http://gateway-server
+        - name: MY_CLIENT_SERVER
+          value: https://client-server ######### https
         - name: MY_OAUTH2_SERVER
           value: http://oauth2-server
         - name: MY_RESOURCE_SERVER
           value: http://resource-server
-        - name: MY_CLIENT_SERVER
-          value: https://client-server      ############### https
-        - name: MY_GATEWAY
-          value: https://gateway-server     ############### https
         - name: MY_EUREKA_SERVER
-          value: http://forsrc:forsrc@eureka-server:8080/eureka
+          value: http://forsrc:forsrc@eureka-server/eureka
         - name: MY_ADMIN_SERVER
-          value: http://admin-server:8080
+          value: http://admin-server
         livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
-            port: 8080
+            port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -61,7 +63,9 @@ spec:
       - name: init-waiting
         image: busybox:1.28
         command: ['sh', '-c', 'until nc -z oauth2-server 80; do echo waiting for oauth2-server 80; sleep 2; done;']
-
+      - name: init-waiting-gateway
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z gateway-server 80; do echo waiting for gateway-server 80; sleep 2; done;']
 ---
 
 apiVersion: v1
@@ -74,6 +78,6 @@ spec:
     app: client-server
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 80
     name: client-server
   type: ClusterIP

@@ -17,14 +17,14 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
-		    .authorizeRequests(a -> a
+			.authorizeRequests(a -> a
 				.antMatchers("/actuator/**", "/.well-known/openid-configuration").permitAll()
 			)
 			.authorizeRequests(
 					authorizeRequests -> authorizeRequests.anyRequest().authenticated()
 			)
-		    .formLogin(withDefaults())
-		    .formLogin()
+			.formLogin(withDefaults())
+			.formLogin()
 			.failureUrl("/login?error")
 			;
 		return http.build();

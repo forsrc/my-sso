@@ -25,12 +25,14 @@ spec:
       - image: forsrc/my-sso:resource-server
         name: resource-server
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         imagePullPolicy: IfNotPresent #Always
         resources: {}
         env:
         - name: MY_PROFILE
           value: k8s
+        - name: MY_PORT
+          value: '80'
         - name: MY_OAUTH2_SERVER
           value: http://oauth2-server
         - name: MY_RESOURCE_SERVER
@@ -38,18 +40,18 @@ spec:
         - name: MY_CLIENT_SERVER
           value: http://client-server
         - name: MY_EUREKA_SERVER
-          value: http://forsrc:forsrc@eureka-server:8080/eureka
+          value: http://forsrc:forsrc@eureka-server/eureka
         livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
-            port: 8080
+            port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -70,6 +72,6 @@ spec:
     app: resource-server
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 80
     name: resource-server
   type: ClusterIP

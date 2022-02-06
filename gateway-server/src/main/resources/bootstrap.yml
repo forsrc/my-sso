@@ -1,6 +1,6 @@
 my:
   hostname: ${MY_HOST_NAME:gateway-server}
-  port: ${MY_PORT:80}
+  port: ${MY_PORT:8080}
   application-name: ${MY_APPLICATION_NAME:gateway-server}
   username: ${MY_USERNAME:forsrc}
   password: ${MY_PASSWORD:forsrc}
@@ -8,7 +8,7 @@ my:
   admin-server: ${MY_ADMIN_SERVER:http://admin-server:8080}
   
   
-  gateway-base-url: ${MY_GATEWAY:http://gateway-server}
+  gateway-base-url: ${MY_GATEWAY:http://gateway-server:8080}
   gateway-oauth2-server: ${my.gateway-base-url}/oauth2-server/
   gateway-resource_server: ${my.gateway-base-url}/resource-server/
   gateway-client-server: ${my.gateway-base-url}/client-server/
@@ -63,12 +63,13 @@ spring:
 
   cloud:
     gateway:
-#      httpclient:
-#        ssl:
-#          useInsecureTrustManager: true
+      httpclient:
+        ssl:
+          useInsecureTrustManager: true
       discovery:
         locator:
           enabled: true
+          url-expression: "'http://'+serviceId"
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -166,7 +167,7 @@ spring:
 eureka:
   instance:
     non-secure-port-enabled: true
-    secure-port-enabled: true
+    secure-port-enabled: false
     #prefer-ip-address:              true
     hostname: ${my.hostname}
     instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
@@ -205,6 +206,7 @@ management:
 
 logging:
   level:
+    root: info
     org.springframework.cloud.gateway: info
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace

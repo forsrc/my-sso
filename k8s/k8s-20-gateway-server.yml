@@ -25,42 +25,40 @@ spec:
       - image: forsrc/my-sso:gateway-server
         name: gateway-server
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         imagePullPolicy: IfNotPresent #Always
         resources: {}
         env:
         - name: MY_PROFILE
           value: k8s
-        - name: MY_OAUTH2_SERVER
-          value: http://oauth2-server
-        - name: MY_RESOURCE_SERVER
-          value: http://:resource-server
-        - name: MY_CLIENT_SERVER
-          value: https://client-server      ############### https
+        - name: MY_PORT
+          value: '80'
         - name: MY_GATEWAY
-          value: https://gateway-server     ############### https
+          value: https://gateway-server
         - name: MY_EUREKA_SERVER
           value: http://forsrc:forsrc@eureka-server/eureka
         - name: MY_ADMIN_SERVER
           value: http://admin-server
+        - name: JAVA_OPTS
+          value: "-Dloging.level.root=debug"
         livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
-            port: 8080
+            port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
-        initContainers:
-        - name: init-waiting
-          image: busybox:1.28
-          command: ['sh', '-c', 'until nc -z eureka-server 80; do echo waiting for eureka-server 80; sleep 2; done;']
+      initContainers:
+      - name: init-waiting
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z oauth2-server 80; do echo waiting for oauth2-server 80; sleep 2; done;']
 
 ---
 
@@ -74,7 +72,7 @@ spec:
     app: gateway-server
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 80
     name: gateway-server
   type: ClusterIP
 

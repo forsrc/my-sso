@@ -25,42 +25,44 @@ spec:
       - image: forsrc/my-sso:oauth2-server
         name: oauth2-server
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         imagePullPolicy: IfNotPresent #Always
         resources: {}
         env:
         - name: MY_PROFILE
           value: k8s
+        - name: MY_PORT
+          value: '80'
+        - name: MY_GATEWAY
+          value: http://gateway-server
+        - name: MY_CLIENT_SERVER
+          value: https://client-server
         - name: MY_OAUTH2_SERVER
           value: http://oauth2-server
         - name: MY_RESOURCE_SERVER
-          value: http://:resource-server
-        - name: MY_CLIENT_SERVER
-          value: https://client-server      ############### https
-        - name: MY_GATEWAY
-          value: https://gateway-server     ############### https
+          value: http://resource-server
         - name: MY_EUREKA_SERVER
-          value: http://forsrc:forsrc@eureka-server:8080/eureka
+          value: http://forsrc:forsrc@eureka-server/eureka
         - name: MY_ADMIN_SERVER
-          value: http://admin-server:8080
+          value: http://admin-server
         livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
-            port: 8080
+            port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
-      # initContainers:
-      # - name: init-waiting
-      #   image: busybox:1.28
-      #   command: ['sh', '-c', 'until nc -z eureka-server 8080; do echo waiting for eureka-server 8080; sleep 2; done;']
+      initContainers:
+      - name: init-waiting
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z eureka-server 80; do echo waiting for eureka-server 80; sleep 2; done;']
 
 ---
 
@@ -74,7 +76,7 @@ spec:
     app: oauth2-server
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 80
     name: oauth2-server
   type: ClusterIP
 

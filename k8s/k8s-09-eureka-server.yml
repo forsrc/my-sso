@@ -25,35 +25,29 @@ spec:
       - image: forsrc/my-sso:eureka-server
         name: eureka-server
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         imagePullPolicy: IfNotPresent #Always
         resources: {}
         env:
         - name: MY_PROFILE
           value: k8s
-        - name: MY_OAUTH2_SERVER
-          value: http://oauth2-server
-        - name: MY_RESOURCE_SERVER
-          value: http://:resource-server
-        - name: MY_CLIENT_SERVER
-          value: http://client-server     
-        - name: MY_GATEWAY
-          value: http://gateway-server     
+        - name: MY_PORT
+          value: '80'   
         - name: MY_EUREKA_SERVER
-          value: http://forsrc:forsrc@eureka-server:8080/eureka
+          value: http://forsrc:forsrc@eureka-server/eureka
         - name: MY_ADMIN_SERVER
           value: http://admin-server
         livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
-            port: 8080
+            port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -74,7 +68,7 @@ spec:
     app: eureka-server
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 80
     name: eureka-server
   type: ClusterIP
 

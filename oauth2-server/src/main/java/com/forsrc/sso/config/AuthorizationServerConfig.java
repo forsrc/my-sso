@@ -39,6 +39,8 @@ public class AuthorizationServerConfig {
 	
 	@Value("${my.oauth2-server}")
 	private String oauth2Server;
+	
+	
 
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
@@ -57,8 +59,12 @@ public class AuthorizationServerConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.redirectUri(clientServer + "/login/oauth2/code/oauth2-client-oidc")
 				.redirectUri(clientServer + "/authorized")
+				.redirectUri(clientServer.replace("http://", "https://") + "/login/oauth2/code/oauth2-client-oidc")
+				.redirectUri(clientServer.replace("http://", "https://") + "/authorized")
 				.redirectUri(gatewayClientServer + "/login/oauth2/code/oauth2-client-gateway-oidc")
 				.redirectUri(gatewayClientServer + "/authorized")
+				.redirectUri(gatewayClientServer.replace("http://", "https://") + "/login/oauth2/code/oauth2-client-gateway-oidc")
+				.redirectUri(gatewayClientServer.replace("http://", "https://") + "/authorized")
 				.scope(OidcScopes.OPENID)
 				.scope("api")
 				.build();
@@ -70,6 +76,8 @@ public class AuthorizationServerConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.redirectUri(gatewayClientServer + "/login/oauth2/code/oauth2-client-gateway-oidc")
 				.redirectUri(gatewayClientServer + "/authorized")
+				.redirectUri(gatewayClientServer.replace("http://", "https://") + "/login/oauth2/code/oauth2-client-gateway-oidc")
+				.redirectUri(gatewayClientServer.replace("http://", "https://") + "/authorized")
 				.scope(OidcScopes.OPENID)
 				.scope("api")
 				.build();
