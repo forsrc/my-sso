@@ -1,2 +1,16 @@
-server:
-  port: 9000
+
+
+my:
+  application-name: ${MY_APPLICATION_NAME:oauth2-server}
+  hostname: ${MY_HOST_NAME:oauth2-server}
+  port: ${MY_PORT:9000}
+
+  redirect-uri: ${MY_REDIRECT_URI}
+  client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
+  oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:9000}
+  resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8090}
+ 
+ 
+  username: ${MY_USERNAME:forsrc}
+  password: ${MY_PASSWORD:forsrc}
+  admin-server: ${MY_ADMIN_SERVER:http://admin-server:9900}

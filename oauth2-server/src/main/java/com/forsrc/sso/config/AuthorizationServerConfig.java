@@ -1,9 +1,12 @@
 package com.forsrc.sso.config;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -16,18 +19,29 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient.Builder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.UUID;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
+	
+	@Value("${my.client-server}")
+	private String clientServer;
+
+	@Value("${my.redirect-uri:#{null}}")
+	private String[] redirectUri;
+	
+	@Value("${my.oauth2-server}")
+	private String oauth2Server;
+	
+	
 
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
@@ -38,19 +52,29 @@ public class AuthorizationServerConfig {
 
 	@Bean
 	public RegisteredClientRepository registeredClientRepository() {
-		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+		Builder builder = RegisteredClient.withId("client-server")
 				.clientId("oauth2-client")
 				.clientSecret("{noop}secret")
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.redirectUri("http://client-server:8080/login/oauth2/code/oauth2-client-oidc")
-				.redirectUri("http://client-server:8080/authorized")
+				.redirectUri(clientServer + "/login/oauth2/code/oauth2-client-oidc")
+				.redirectUri(clientServer + "/authorized")
+				.redirectUri(clientServer.replace("http://", "https://") + "/login/oauth2/code/oauth2-client-oidc")
+				.redirectUri(clientServer.replace("http://", "https://") + "/authorized")
 				.scope(OidcScopes.OPENID)
-				.scope("api")
-				.build();
+				.scope("api");
+		if (redirectUri != null) {
+			for(String uri : redirectUri) {
+				builder.redirectUri(uri);
+			}
+		}
+		
+		RegisteredClient registeredClient =	builder.build();
 
-		return new InMemoryRegisteredClientRepository(registeredClient);
+		InMemoryRegisteredClientRepository repository = new InMemoryRegisteredClientRepository(registeredClient);
+				
+		return repository;
 	}
 
 	@Bean
@@ -81,6 +105,6 @@ public class AuthorizationServerConfig {
 
 	@Bean
 	public ProviderSettings providerSettings() {
-		return ProviderSettings.builder().issuer("http://oauth2-server:9000").build();
+		return ProviderSettings.builder().issuer(oauth2Server).build();
 	}
 }

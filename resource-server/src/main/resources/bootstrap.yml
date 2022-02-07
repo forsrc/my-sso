@@ -1,11 +1,22 @@
 
-server:
-  port: 8080
+
 
 my:
+  application-name: ${MY_APPLICATION_NAME:resource-server}
+  hostname: ${MY_HOST_NAME:resource-server}
+  port: ${MY_PORT:8080}
   client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
   oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:8080}
   resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8080}
+  username: ${MY_USERNAME:forsrc}
+  password: ${MY_PASSWORD:forsrc}
+  eureka-server: ${MY_EUREKA_SERVER:http://forsrc:forsrc@eureka-server:8080/eureka}
+  admin-server: ${MY_ADMIN_SERVER:http://admin-server:8080}
+
+server:
+  port: ${my.port}
+
+
 
 logging:
   level:
@@ -15,15 +26,30 @@ logging:
     org.springframework.security.oauth2: INFO
 
 spring:
+  application:
+    name: ${my.application-name}
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${my.oauth2-server}
+
+  boot:
+    admin:
+      client:
+        url: ${my.admin-server}
+        username: ${my.username}
+        password: ${my.password}
+        instance:
+          service-base-url: ${my.hostname}:${my.port}
+          management-base-url: ${my.hostname}:${my.port}
           
 management:
   endpoints:
     web:
+      exposure:
+        include: "*"
+    jmx:
       exposure:
         include: "*"
   endpoint:
@@ -31,3 +57,15 @@ management:
       show-details: ALWAYS
       probes:
         enabled: true
+
+#eureka:
+#  instance:
+#    non-secure-port-enabled: true
+#    secure-port-enabled: false
+#    hostname: ${my.hostname}
+#    instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+#    appname: ${spring.application.name}
+#    leaseRenewalIntervalInSeconds: 5
+#  client:
+#    service-url: 
+#      defaultZone: ${my.eureka-server}

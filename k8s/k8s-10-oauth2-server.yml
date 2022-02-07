@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: oauth2-server
+  name: oauth2-server
+  namespace: my-sso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth2-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: oauth2-server
+      # annotations:
+      #   co.elastic.logs/enabled: "true"
+      #   co.elastic.logs.json-logging/json.keys_under_root: "true"
+      #   co.elastic.logs.json-logging/json.add_error_key: "true"
+      #   co.elastic.logs.json-logging/json.message_key: "message"
+    spec:
+      containers:
+      - image: forsrc/my-sso:oauth2-server
+        name: oauth2-server
+        ports:
+        - containerPort: 80
+        imagePullPolicy: IfNotPresent #Always
+        resources: {}
+        env:
+        - name: MY_PROFILE
+          value: k8s
+        - name: MY_PORT
+          value: '80'
+        - name: MY_REDIRECT_URI
+          value: https://ui-server/login/oauth2/code/oauth2-client-oidc, https://ui-server/authorized
+        - name: MY_CLIENT_SERVER
+          value: https://client-server
+        - name: MY_OAUTH2_SERVER
+          value: http://oauth2-server
+        - name: MY_RESOURCE_SERVER
+          value: http://resource-server
+        - name: MY_ADMIN_SERVER
+          value: http://admin-server
+#        - name: MY_EUREKA_SERVER
+#          value: http://forsrc:forsrc@eureka-server/eureka
+        livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+#      initContainers:
+#      - name: init-waiting
+#        image: busybox:1.28
+#        command: ['sh', '-c', 'until nc -z eureka-server 80; do echo waiting for eureka-server 80; sleep 2; done;']
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth2-server
+  namespace: my-sso
+spec:
+  selector:
+    app: oauth2-server
+  ports:
+  - port: 80
+    targetPort: 80
+    name: oauth2-server
+  type: ClusterIP
+
