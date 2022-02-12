@@ -46,12 +46,12 @@ spec:
 #        - name: MY_EUREKA_SERVER
 #          value: http://forsrc:forsrc@eureka-server/eureka
         livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 5
+          httpGet:
+            path: /actuator/health/liveness
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
@@ -59,10 +59,10 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
-#      initContainers:
-#      - name: init-waiting
-#        image: busybox:1.28
-#        command: ['sh', '-c', 'until nc -z eureka-server 80; do echo waiting for eureka-server 80; sleep 2; done;']
+      initContainers:
+      - name: init-waiting-db
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres 5432; sleep 2; done;']
 
 ---
 

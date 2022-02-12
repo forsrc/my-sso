@@ -31,15 +31,15 @@ spring:
           oauth2-client-oidc:
             provider: spring
             client-id: oauth2-client
-            client-secret: secret
+            client-secret: forsrc
             authorization-grant-type: authorization_code
             redirect-uri: ${my.client-server}/login/oauth2/code/{registrationId}
-            scope: openid
+            scope: openid, api
             client-name: oauth2-client-oidc
           oauth2-client-authorization-code:
             provider: spring
             client-id: oauth2-client
-            client-secret: secret
+            client-secret: forsrc
             authorization-grant-type: authorization_code
             redirect-uri: ${my.client-server}/authorized
             scope: api

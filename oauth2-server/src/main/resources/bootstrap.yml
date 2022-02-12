@@ -4,7 +4,7 @@ my:
   hostname: ${MY_HOST_NAME:oauth2-server}
   port: ${MY_PORT:8080}
 
-  redirect-uri: ${MY_REDIRECT_URI}
+  redirect-uri: ${MY_REDIRECT_URI:}
   client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
   oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:8080}
   resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8080}
@@ -24,11 +24,31 @@ logging:
     org.springframework.web: INFO
     org.springframework.security: INFO
     org.springframework.security.oauth2: INFO
-    
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
     
 spring:
   application:
     name: ${my.application-name}
+  datasource:
+    url: ${MY_DB_URL:jdbc:postgresql://postgres:5432/my-sso}
+    username: ${MY_DB_USERNAME:postgres}
+    password: ${MY_DB_PASSWORD:postgres}
+    driver-class-name: ${MY_DB_DRIVER:org.postgresql.Driver}
+    initialization-mode: ALWAYS
+    schema:
+    - classpath:schema.sql
+    data:
+    - classpath:data.sql
+
+  jpa:
+    database-platform: ${MY_DB_DIALECT:org.hibernate.dialect.PostgreSQL10Dialect}
+    show-sql: true
+    properties:
+      hibernate.enable_lazy_load_no_trans: true
+      hibernate.show-sql: true
+      hibernate.hbm2ddl.auto: update
+    open-in-view: true
 
   boot:
     admin:

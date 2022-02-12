@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: postgres
+  name: postgres
+  namespace: my-sso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: postgres
+      # annotations:
+      #   co.elastic.logs/enabled: "true"
+      #   co.elastic.logs.json-logging/json.keys_under_root: "true"
+      #   co.elastic.logs.json-logging/json.add_error_key: "true"
+      #   co.elastic.logs.json-logging/json.message_key: "message"
+    spec:
+      containers:
+      - image: postgres
+        name: postgres
+        ports:
+        - containerPort: 5432
+        imagePullPolicy: IfNotPresent #Always
+        resources: {}
+        env:
+        - name: POSTGRES_DB
+          value: my-sso
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        livenessProbe:
+            tcpSocket:
+               port: 5432
+            initialDelaySeconds: 10
+            periodSeconds: 3
+            timeoutSeconds: 3
+            failureThreshold: 2
+        readinessProbe:
+            tcpSocket:
+               port: 5432
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            timeoutSeconds: 1
+            successThreshold: 1
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: my-sso
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+    name: postgres
+  type: ClusterIP
+
