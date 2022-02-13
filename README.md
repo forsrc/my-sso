@@ -9,9 +9,10 @@ kubectl apply -f k8s
 ```
 $ kubectl get pod -n my-sso
 NAME                               READY   STATUS    RESTARTS   AGE
-client-server-69c6bb7bff-2wdtg     1/1     Running   0          76m
-oauth2-server-7759bb565-v6mlj      1/1     Running   0          76m
-resource-server-654c7b99dd-qgcjq   1/1     Running   0          76m
+client-server-f685bf54f-95d2v     1/1     Running   0          5m30s
+oauth2-server-7b84bb8fc7-4ljsk    1/1     Running   0          5m31s
+postgres-76bfc5cd6c-dbszw         1/1     Running   0          5m31s
+resource-server-c96fcccb9-hlsbj   1/1     Running   0          5m31s
 
 $ kubectl get ingress -n my-sso
 NAME     CLASS    HOSTS                                         ADDRESS     PORTS     AGE
@@ -19,20 +20,22 @@ my-sso   <none>   oauth2-server,resource-server,client-server   localhost   80, 
 
 $ kubectl get secret -n my-sso
 NAME                  TYPE                                  DATA   AGE
-default-token-757ln   kubernetes.io/service-account-token   3      78m
-my-sso.forsrc.com     kubernetes.io/tls                     2      78m
+default-token-757ln   kubernetes.io/service-account-token   3      10m
+my-sso.forsrc.org     kubernetes.io/tls                     2      10m
 
 $ kubectl get svc -n my-sso
 NAME              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
-client-server     ClusterIP   10.99.22.253     <none>        80/TCP    79m
-oauth2-server     ClusterIP   10.101.103.234   <none>        80/TCP    79m
-resource-server   ClusterIP   10.98.193.81     <none>        80/TCP    79m
+client-server     ClusterIP   10.97.45.212     <none>        80/TCP     10m
+oauth2-server     ClusterIP   10.107.3.190     <none>        80/TCP     10m
+postgres          ClusterIP   10.101.192.255   <none>        5432/TCP   10m
+resource-server   ClusterIP   10.106.251.253   <none>        80/TCP     10m
 
 $ kubectl get deployment -n my-sso
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-client-server     1/1     1            1           80m
-oauth2-server     1/1     1            1           80m
-resource-server   1/1     1            1           80m
+client-server     1/1     1            1           10m
+oauth2-server     1/1     1            1           10m
+postgres          1/1     1            1           10m
+resource-server   1/1     1            1           10m
 
 ```
 
