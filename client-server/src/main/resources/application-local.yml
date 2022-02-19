@@ -6,6 +6,7 @@ my:
   client-server: ${MY_CLIENT_SERVER:http://client-server:8080}
   oauth2-server: ${MY_OAUTH2_SERVER:http://oauth2-server:9000}
   resource-server: ${MY_RESOURCE_SERVER:http://resource-server:8090}
+  logout-url: ${MY_LOGOUT_URL:${my.oauth2-server}/oauth/logout?referer=${my.client-server}}
   admin-server: ${MY_ADMIN_SERVER:http://admin-server:9900}
   username: ${MY_USERNAME:forsrc}
   password: ${MY_PASSWORD:forsrc}
