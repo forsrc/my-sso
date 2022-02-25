@@ -56,4 +56,11 @@ public class SecurityConfig {
 		return manager;
 	}
 
+	public static void main(String[] args) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		System.out.println("forsrc:" + encoder.encode("forsrc"));
+		System.out.println("user:" + encoder.encode("user"));
+		System.out.println("tcc:" + encoder.encode("tcc"));
+		System.out.println("test:" + encoder.encode("test"));
+	}
 }

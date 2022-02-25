@@ -17,7 +17,7 @@ SELECT
 	'client-server',
 	'oauth2-client',
 	'2022-01-01 00:00:00.123456',
-	'{noop}forsrc',
+	'$2a$10$KvC1GxfKWxFRIQoOM3k2tebK94KRV0tHZNkcVwwcj1zOnaknsWIxm',
 	NULL,
 	'client-server',
 	'client_secret_basic',
@@ -49,7 +49,7 @@ SELECT
 	'forsrc',
 	'forsrc',
 	'2022-01-01 00:00:00.123456',
-	'$2a$10$Wzme7qZtAsJZspQpNx3ee.qTu/IqRHiTb0jORWUOXCxptAkG3kf8e',
+	'$2a$10$KvC1GxfKWxFRIQoOM3k2tebK94KRV0tHZNkcVwwcj1zOnaknsWIxm',
 	NULL,
 	'client-server',
 	'client_secret_basic',
@@ -66,19 +66,19 @@ WHERE
 -- users
 INSERT INTO users (username, password, enabled)
 	SELECT *
-	FROM (SELECT 'forsrc' username, '$2a$10$Wzme7qZtAsJZspQpNx3ee.qTu/IqRHiTb0jORWUOXCxptAkG3kf8e' password, 1 enabled) AS T
+	FROM (SELECT 'forsrc' username, '$2a$10$KvC1GxfKWxFRIQoOM3k2tebK94KRV0tHZNkcVwwcj1zOnaknsWIxm' AS password, 1 enabled) AS T
 	WHERE NOT EXISTS(SELECT username FROM users WHERE username = 'forsrc');
 INSERT INTO users (username, password, enabled)
 SELECT *
-FROM (SELECT 'user' username, '$2a$10$SNKOBpTBuCbWukZ3Rc5DpuIHRP585Ss02fULAIX/m1NmFpWeJ8ic2' password, 1 enabled) AS T
+FROM (SELECT 'user' username, '$2a$10$TA.66xpvL4V8ocTR5.u1OOIXh/VoaM8x3drxxRmAnsvF8JYLMT8kW' AS password, 1 enabled) AS T
 WHERE NOT EXISTS(SELECT username FROM users WHERE username = 'user');
 INSERT INTO users (username, password, enabled)
 SELECT *
-FROM (SELECT 'tcc' username, '$2a$10$lFUTwK/W3S3U8NI3cnqJPeVD3cZj6udLbW2W5GMvybtJw70N4WqFC' password, 1 enabled) AS T
+FROM (SELECT 'tcc' username, '$2a$10$BOuZIrkHUIXDV90DGHpCDOM/lDfxSOCX9hTXD5.MuZDPg33NfrY/2' AS password, 1 enabled) AS T
 WHERE NOT EXISTS(SELECT username FROM users WHERE username = 'tcc');
 INSERT INTO users (username, password, enabled)
 SELECT *
-FROM (SELECT 'test' username, '$2a$10$uCchlP6N1q7ZOEMMifeZyOEOgqpddiVEIiIrM4k/76ftgLxtBaSXq' password, 1 enabled) AS T
+FROM (SELECT 'test' username, '$2a$10$2wFHbWQjpSiTH5JXbb9RDOMf62klLKRIM4vZCfYMpP0y4y4m0T5XO' AS password, 1 enabled) AS T
 WHERE NOT EXISTS(SELECT username FROM users WHERE username = 'test');
 
 -- authorities
