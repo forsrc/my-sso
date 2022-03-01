@@ -22,14 +22,19 @@ logging:
   level:
     root: INFO
     org.springframework.web: INFO
-    org.springframework.security: INFO
-    org.springframework.security.oauth2: INFO
+    org.springframework.security: debug
+    org.springframework.security.oauth2: debug
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
     
 spring:
   application:
     name: ${my.application-name}
+  thymeleaf:
+    cache: false
+    enabled: true
+    prefix: classpath:/templates/
+    suffix: .html
   datasource:
     url: ${MY_DB_URL:jdbc:postgresql://postgres:5432/my-sso}
     username: ${MY_DB_USERNAME:postgres}

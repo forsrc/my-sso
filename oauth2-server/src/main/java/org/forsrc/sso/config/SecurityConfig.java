@@ -6,6 +6,8 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,12 +20,11 @@ public class SecurityConfig {
 
 	@Autowired
 	private DataSource dataSource;
-	
-	@Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -31,21 +32,23 @@ public class SecurityConfig {
  
 		http
 			.authorizeRequests(a -> a
-				.antMatchers("/actuator/**", "/.well-known/openid-configuration").permitAll()
+				.antMatchers("/actuator/**", "/.well-known/openid-configuration", "/static/**").permitAll()
 			)
 			.authorizeRequests(
 					authorizeRequests -> authorizeRequests.anyRequest().authenticated()
 			)
 			.formLogin(withDefaults())
 			.formLogin()
+			.loginPage("/login")
+			.permitAll()
 			.failureUrl("/login?error")
+			.permitAll()
 			;
 		// @formatter:on
 		return http.build();
 	}
 
-	
-	
+
 	@Bean
 	UserDetailsService users() {
 		JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
@@ -55,6 +58,15 @@ public class SecurityConfig {
 //				"SELECT g.id, g.group_name, ga.authority FROM groups g, group_members gm, group_authorities ga WHERE gm.username = ? and g.id = ga.group_id and g.id = gm.group_id");
 		return manager;
 	}
+
+//	@Bean
+//	public AuthenticationManager bindAuthenticationProvider(@Autowired AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+//
+//		// authenticationManagerBuilder.authenticationProvider(...);
+//		AuthenticationManager authenticationManager = authenticationManagerBuilder.getObject();
+//		System.out.println(authenticationManager);
+//		return authenticationManager;
+//	}
 
 	public static void main(String[] args) {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

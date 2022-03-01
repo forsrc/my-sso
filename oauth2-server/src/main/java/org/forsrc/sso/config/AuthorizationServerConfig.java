@@ -6,6 +6,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -26,6 +28,7 @@ import org.springframework.security.oauth2.server.authorization.client.JdbcRegis
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient.Builder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -46,6 +49,9 @@ public class AuthorizationServerConfig {
 	@Value("${my.oauth2-server}")
 	private String oauth2Server;
 
+	@Autowired
+    private PasswordEncoder passwordEncoder;
+
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -61,7 +67,7 @@ public class AuthorizationServerConfig {
 
 		Builder builder = RegisteredClient.withId("client-server")
 				.clientId("oauth2-client")
-				.clientSecret("{noop}forsrc")
+				.clientSecret(passwordEncoder.encode("forsrc"))
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
@@ -72,7 +78,9 @@ public class AuthorizationServerConfig {
 				.redirectUri(clientServer.replace("http://", "https://") + "/login/oauth2/code/oauth2-client-oidc")
 				.redirectUri(clientServer.replace("http://", "https://") + "/authorized")
 				.scope(OidcScopes.OPENID)
-				.scope("api");
+				.scope("api")
+				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+				;
 		// @formatter:on
 
 		if(redirectUri != null) {
