@@ -1,0 +1,30 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.forsrc.sso.dao.mapper.UserMapper">
+
+    <resultMap id="resultMap" type="org.forsrc.sso.entity.User">
+        <id property="username" column="username"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="enable" column="enable" />
+        <result property="jwtToken" column="jwt_token" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="version" column="version" />
+    </resultMap>
+
+    <select id="findByAuthority" resultType="org.forsrc.sso.entity.User"
+            resultMap="resultMap" parameterType="String">
+        SELECT * FROM t_sso_user U INNER JOIN t_sso_authority A ON U.username = A.username WHERE A.authority = #{authority}
+    </select>
+    
+    <update id="updateJwtToken" flushCache="true">
+    	UPDATE t_sso_user SET jwt_token = #{jwtToken}, version = version + 1 WHERE username = #{username} and version = #{version}
+    </update>
+
+    <update id="updatePassword" flushCache="true">
+    	UPDATE t_sso_user SET password = #{password}, version = version + 1 WHERE username = #{username} and version = #{version}
+    </update>
+    
+</mapper>

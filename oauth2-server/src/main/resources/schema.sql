@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS oauth2_authorization_consent
 (
     registered_client_id varchar(100)  NOT NULL,
     principal_name       varchar(200)  NOT NULL,
-    authorities          varchar(1000) NOT NULL,
+    t_sso_authoritiy          varchar(1000) NOT NULL,
     PRIMARY KEY (registered_client_id, principal_name)
 );
 
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS ClientDetails (
   scope                  VARCHAR(256),
   grantTypes             VARCHAR(256),
   redirectUrl            VARCHAR(256),
-  authorities            VARCHAR(256),
+  t_sso_authoritiy            VARCHAR(256),
   access_token_validity  INTEGER,
   refresh_token_validity INTEGER,
   additionalInformation  VARCHAR(4096),
@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS ClientDetails (
 );
 
 
--- DROP TABLE IF EXISTS users;
-CREATE TABLE IF NOT EXISTS users
+-- DROP TABLE IF EXISTS t_sso_user;
+CREATE TABLE IF NOT EXISTS t_sso_user
 (
     username  VARCHAR(50)  NOT NULL PRIMARY KEY ,
     password  VARCHAR(200) NOT NULL,
@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS users
 );
 
 
--- DROP TABLE IF EXISTS authorities;
-CREATE TABLE IF NOT EXISTS authorities
+-- DROP TABLE IF EXISTS t_sso_authority;
+CREATE TABLE IF NOT EXISTS t_sso_authority
 (
     username  VARCHAR(50) NOT NULL,
     authority VARCHAR(50) NOT NULL,

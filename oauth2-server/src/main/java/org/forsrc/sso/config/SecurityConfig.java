@@ -43,6 +43,12 @@ public class SecurityConfig {
 			.permitAll()
 			.failureUrl("/login?error")
 			.permitAll()
+			.and()
+			.logout()
+			.logoutUrl("/logout")
+			.permitAll()
+			.logoutSuccessUrl("/login?logout")
+			.permitAll()
 			;
 		// @formatter:on
 		return http.build();
@@ -52,8 +58,8 @@ public class SecurityConfig {
 	@Bean
 	UserDetailsService users() {
 		JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
-		manager.setUsersByUsernameQuery("SELECT username, password, enabled FROM users WHERE username = ?");
-		manager.setAuthoritiesByUsernameQuery("SELECT username,authority FROM authorities WHERE username = ?");
+		manager.setUsersByUsernameQuery("SELECT username, password, enabled FROM t_sso_user WHERE username = LOWER(?)");
+		manager.setAuthoritiesByUsernameQuery("SELECT username, authority FROM t_sso_authority WHERE username = LOWER(?)");
 //		manager.setGroupAuthoritiesByUsernameQuery(
 //				"SELECT g.id, g.group_name, ga.authority FROM groups g, group_members gm, group_authorities ga WHERE gm.username = ? and g.id = ga.group_id and g.id = gm.group_id");
 		return manager;

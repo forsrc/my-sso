@@ -40,7 +40,7 @@ public class JpaConfig {
 
 		// @formatter:off
 		LocalContainerEntityManagerFactoryBean entityManagerFactory = builder.dataSource(dataSource)
-				.packages("org.forsrc.sso.model")
+				.packages("org.forsrc.sso.entity")
 				.persistenceUnit("persistenceUnit-mysso-oauth2-server")
 				.properties(jpaProperties.getProperties())
 				.build();
