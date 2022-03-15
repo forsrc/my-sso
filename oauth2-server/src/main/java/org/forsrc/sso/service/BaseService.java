@@ -23,6 +23,9 @@ public interface BaseService<T extends Serializable, PK> {
     @Transactional(rollbackFor = { Exception.class })
     public T update(T t);
 
+    @Transactional(rollbackFor = { Exception.class })
+    public T update(PK pk, T t);
+
     @Transactional(readOnly = true)
     public Page<T> page(int page, int size);
 

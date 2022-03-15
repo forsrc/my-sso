@@ -26,7 +26,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     @Override
     @Transactional(readOnly = true)
     public User getByUsername(String username) {
-        return userDao.getOne(username);
+        return userDao.getById(username);
     }
 
     @Override

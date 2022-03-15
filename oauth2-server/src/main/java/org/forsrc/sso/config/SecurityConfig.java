@@ -49,6 +49,9 @@ public class SecurityConfig {
 			.permitAll()
 			.logoutSuccessUrl("/login?logout")
 			.permitAll()
+			.and()
+			.csrf()
+			.ignoringAntMatchers("/api/**")
 			;
 		// @formatter:on
 		return http.build();

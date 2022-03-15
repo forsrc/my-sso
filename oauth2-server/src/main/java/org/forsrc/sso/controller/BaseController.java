@@ -74,6 +74,15 @@ public abstract class BaseController<T extends Serializable, PK> {
         return new ResponseEntity<>(t, HttpStatus.OK);
     }
 
+    @PutMapping("/{pk}")
+    public ResponseEntity<T> update(@PathVariable("pk") PK pk, @RequestBody T t) {
+        Assert.notNull(t, "update: Object is null");
+        // Assert.notNull(user.getUsername(), "save: username is nul");
+        LOGGER.info("-->\tupdate({}) {}", pk, t);
+        t = getBaseService().update(pk, t);
+        return new ResponseEntity<>(t, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{pk}")
     public ResponseEntity<Map<String, Object>> delete(@PathVariable("pk") PK pk) {
         Assert.notNull(pk, "delete: pk is nul");
